@@ -1,0 +1,24 @@
+# Секреты — никогда в репозиторий!
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+
+# База данных
+*.sqlite3
+*.db
+
+# Логи
+logs/
+
+# IDE
+.idea/
+.vscode/
+*.swp
