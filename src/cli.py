@@ -12,8 +12,6 @@ cli.py — точка входа в приложение, CLI-интерфейс
     python -m src.cli status --limit 20
 """
 
-import time
-
 import click
 
 from src.alert_service import evaluate_and_alert
@@ -21,6 +19,7 @@ from src.checker import check_url
 from src.config import load_config
 from src.logger import get_logger, setup_logging
 from src.repository import get_latest_results, init_db, save_result
+from src.scheduler import start_scheduler
 
 logger = get_logger(__name__)
 
@@ -54,13 +53,8 @@ def run() -> None:
     for url in config.urls:
         logger.info("  → {}", url)
 
-    # NOTE (Day 3): заменить на APScheduler в scheduler.py для гибкого расписания.
-    try:
-        while True:
-            _run_single_pass(config)
-            time.sleep(config.check_interval_seconds)
-    except KeyboardInterrupt:
-        logger.info("Scheduler stopped by user.")
+    # Планировщик сам выполнит первый запуск немедленно, затем — по интервалу.
+    start_scheduler(lambda: _run_single_pass(config), config.check_interval_seconds)
 
 
 @cli.command()

@@ -1,0 +1,13 @@
+services:
+  healthchecker:
+    build: .
+    container_name: healthchecker
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      # SQLite-база и логи переживают перезапуск контейнера
+      - ./data:/app/data
+      - ./logs:/app/logs
+    environment:
+      - DATABASE_PATH=/app/data/db.sqlite3
