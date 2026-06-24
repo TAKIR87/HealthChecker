@@ -16,6 +16,7 @@ import time
 
 import click
 
+from src.alert_service import evaluate_and_alert
 from src.checker import check_url
 from src.config import load_config
 from src.logger import get_logger, setup_logging
@@ -25,13 +26,11 @@ logger = get_logger(__name__)
 
 
 def _run_single_pass(config) -> None:
-    """Выполнить одну проверку всех URL и сохранить результаты в БД."""
+    """Выполнить одну проверку всех URL, сохранить результаты и обработать алерты."""
     for url in config.urls:
         result = check_url(url, timeout=config.request_timeout_seconds)
         save_result(config.database_path, result)
-        if not result.is_up:
-            # TODO (Day 3): подключить alert_service.py + notifier.py
-            logger.warning("ALERT (not yet sent): {} is DOWN", url)
+        evaluate_and_alert(result, config.telegram_bot_token, config.telegram_chat_id)
 
 
 @click.group()
