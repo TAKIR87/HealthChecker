@@ -75,6 +75,7 @@ healthchecker/
 ├── .env.example
 ├── .env                    # не коммитить!
 ├── .gitignore
+├── .flake8
 ├── Dockerfile
 ├── docker-compose.yml
 ├── requirements.txt
@@ -138,9 +139,9 @@ python -m src.cli status         # посмотреть последние ре�
 ## CLI-команды
 
 ```bash
-python -m src.cli run       # запустить планировщик (бесконечный цикл)
-python -m src.cli status    # вывести последние N результатов из БД
+python -m src.cli run       # запустить планировщик (бесконечный цикл, APScheduler)
 python -m src.cli check     # разовая проверка всех URL прямо сейчас
+python -m src.cli status    # вывести последние N результатов из БД (--limit N)
 ```
 
 ---
@@ -150,11 +151,10 @@ python -m src.cli check     # разовая проверка всех URL пр�
 Логи пишутся одновременно в консоль и в файл `logs/healthchecker.log` с ротацией по размеру (10 MB) и хранением за 7 дней.
 
 ```
-2025-06-18 12:00:01 | INFO    | Scheduler started. Interval: 60s
-2025-06-18 12:00:01 | INFO    | Checking https://example.com ...
-2025-06-18 12:00:02 | INFO    | OK | 200 | 143ms | SSL valid (87 days)
-2025-06-18 12:01:01 | ERROR   | FAIL | https://api.site.ru | Connection timeout
-2025-06-18 12:01:01 | WARNING | Alert sent to Telegram: api.site.ru is DOWN
+2026-06-25 12:00:01 | INFO     | src.scheduler:45 | Scheduler configured. Interval: 60s. Starting...
+2026-06-25 12:00:01 | INFO     | src.checker:90  | OK | https://example.com | 143ms | SSL valid (87d)
+2026-06-25 12:01:01 | ERROR    | src.checker:99  | FAIL | https://api.site.ru | Connection timeout
+2026-06-25 12:01:01 | WARNING  | src.alert_service:60 | State change DOWN for https://api.site.ru. Sending alert.
 ```
 
 ---
@@ -168,8 +168,8 @@ python -m src.cli check     # разовая проверка всех URL пр�
 | Планировщик | APScheduler |
 | CLI | Click |
 | Логирование | Loguru |
-| БД | SQLite + aiosqlite |
-| Telegram | python-telegram-bot |
+| БД | SQLite (модуль `sqlite3` стандартной библиотеки) |
+| Telegram | Прямые HTTP-запросы к Bot API через httpx |
 | Линтер | Flake8 + Black |
 | Контейнеризация | Docker + docker-compose |
 

@@ -3,8 +3,6 @@ apscheduler==3.10.4
 click==8.1.7
 loguru==0.7.2
 python-dotenv==1.0.1
-aiosqlite==0.20.0
-python-telegram-bot==21.3
 
 # Dev / линтер
 flake8==7.0.0
